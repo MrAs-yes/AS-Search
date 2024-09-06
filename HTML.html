@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS Quick Clothes Search</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff; /* Biru langit */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+         }
+
+        .container {
+            background-color: #000;
+            color: #000;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            max-width: 700px;
+            width: 100%; /* Memastikan kontainer tidak lebih lebar dari layar */
+            height: 50vh; /* Memperpanjang kontainer ke bawah */
+            overflow-y: auto; /* Menambahkan scroll jika isinya melebihi tinggi kontainer */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+        }
+
+        h1 {
+            position: relative;
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff6600;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        h1 span {
+                 position: absolute;
+                 right: 0; /* Posisikan "by AS Corps" di ujung kanan */
+                 bottom: 0;
+                 font-size: 0.5em;
+                 color: #ccc;
+        }
+
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px #00ccff, 0 0 20px #0099ff;
+            }
+            100% {
+                text-shadow: 0 0 20px #00ccff, 0 0 30px #0066ff;
+            }
+        }
+
+        select, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            font-size: 1.2em;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            background: #fff;
+            color: #000;
+        }
+
+        select:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        button {
+            background: #000;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .results p {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            word-break: break-word;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .results a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .results a:hover {
+            color: #ff6600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AS Clothes Search<span>by AS Corps</h1>
+        <form id="searchForm">
+            <label for="brand">Select Clothes:</label>
+            <select id="brand" name="brand">
+              <option value="Pakaian">Pakaian</option>
+              <option value="Pakaian Pria">Pakaian Pria</option>
+              <option value="Pakaian Wanita">Pakaian Wanita</option>
+              <option value="Pakaian Anak">Pakaian Anak</option>
+            </select>
+
+            <style>
+              select option {
+               color: #000080; /* Biru navy */
+               font-family: 'Roboto', sans-serif; /* Font 'Roboto' */
+              }
+            </style>
+
+            <label for="type">Select Type Clothes:</label>
+            <select id="type" name="type">
+                <option value="">All Clothes Types</option>
+                <option value="Topi Pria">Topi Pria</option>
+                <option value="Kacamata Pria">Kacamata Pria</option>
+                <option value="Baju Pria">Baju Pria</option>
+                <option value="Celana Pria">Celana Pria</option>
+                <option value="Sepatu Pria">Sepatu Pria</option>
+                <option value="Jilbab Wanita">Jilbab Wanita</option>
+                <option value="Baju Wanita">Baju Wanita</option>
+                <option value="Tas Wanita">Tas Wanita</option>
+                <option value="Rok Wanita">Rok Wanita</option>
+                <option value="Sepatu Wanita">Sepatu Wanita</option>
+                <option value="Baju Anak">Baju Anak</option>
+                <option value="Celana Anak">Celana Anak</option>
+                <option value="Sepatu Anak">Sepatu Anak</option>
+            </select>
+
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        const products = {
+            "Pakaian Pria": [
+                { type: "Topi Pria", name: "RCKLS. Polo Cap Black Brown | Topi denim I topi Pria", link: "https://shopee.co.id/RCKLS.-Polo-Cap-Black-Brown-Topi-denim-I-topi-Pria-i.265547337.15822496196?sp_atk=1bacd601-dd35-4861-83b9-be7ef405027f&xptdk=1bacd601-dd35-4861-83b9-be7ef405027f" },
+                { type: "Kacamata Pria", name: "FUNAYUREI D14 Kacamata Hitam Pria dan Wanita Kacamata Blue Light Blocking Anti Sinar Biru FREE POUCH", link: "https://shopee.co.id/FUNAYUREI-D14-Kacamata-Hitam-Pria-dan-Wanita-Kacamata-Blue-Light-Blocking-Anti-Sinar-Biru-FREE-POUCH-i.709027192.24321366336?sp_atk=04d33cc1-c891-4ae8-a54e-0f225c9ec6b4&xptdk=04d33cc1-c891-4ae8-a54e-0f225c9ec6b4" },
+                { type: "Baju Pria", name: "Dobujack Tshirt Basic Small Patch Black Tees", link: "https://shopee.co.id/Dobujack-Tshirt-Basic-Small-Patch-Black-Tees-i.175456753.23981374102?sp_atk=eb8b50ce-5175-41ec-bfa0-d78989624ee8&xptdk=eb8b50ce-5175-41ec-bfa0-d78989624ee8" },
+                { type: "Celana Pria", name: "RoosterDenim Celana Jeans Pria Skinny Biker Motor Knee Rips Black Denim Selvedge", link: "https://shopee.co.id/RoosterDenim-Celana-Jeans-Pria-Skinny-Biker-Motor-Knee-Rips-Black-Denim-Selvedge-i.293452135.7347692943?sp_atk=9599ecc9-268d-411c-9188-7fd6ce20b287&xptdk=9599ecc9-268d-411c-9188-7fd6ce20b287" },
+                { type: "Sepatu Pria", name: "Ando Official Sepatu Sneakers Bsc 21 Pria Dewasa - Hitam/Putih", link: "https://shopee.co.id/Ando-Official-Sepatu-Sneakers-Bsc-21-Pria-Dewasa-Hitam-Putih-i.449538230.23944450318?sp_atk=4707a12b-07a9-474d-9fd1-83c26ba367ad&xptdk=4707a12b-07a9-474d-9fd1-83c26ba367ad" }
+            ],
+            "Pakaian Wanita": [
+                { type: "Jilbab Wanita", name: "HIJAB SEGITIGA INSTAN XL JERSEY|| SEGITIGA INSTAN JERSEY JILBAB SEGITIGA INSTAN JERSEY", link: "https://shopee.co.id/HIJAB-SEGITIGA-INSTAN-XL-JERSEY-SEGITIGA-INSTAN-JERSEY-JILBAB-SEGITIGA-INSTAN-JERSEY-i.340574253.24432852302?sp_atk=8b9f0816-0a87-4160-bc39-eb290355f444&xptdk=8b9f0816-0a87-4160-bc39-eb290355f444" },
+                { type: "Baju Wanita", name: "Kemeja salur wanita//kemeja saku//baju atasan remaja dewasa//outfit kekinian//kemeja terlaris", link: "https://shopee.co.id/kemeja-salur-wanita-kemeja-saku-baju-atasan-remaja-dewasa-outfit-kekinian-kemeja-terlaris-i.256864888.22472382162?sp_atk=80d67549-aa75-4f64-9e3f-f425bcb94cc0&xptdk=80d67549-aa75-4f64-9e3f-f425bcb94cc0" },
+                { type: "Tas Wanita", name: "MOSSDOOM Tas Selempang Wanita Balerie Bag Nyaman dan Praktis Tas Bahu Ketiak", link: "https://shopee.co.id/MOSSDOOM-Tas-Selempang-Wanita-Balerie-Bag-Nyaman-dan-Praktis-Tas-Bahu-Ketiak-i.800625687.23683444781?sp_atk=8f40c537-d3be-4123-9da2-aefbfb36d3db&xptdk=8f40c537-d3be-4123-9da2-aefbfb36d3db" },
+                { type: "Rok Wanita", name: "Maundy skirt long square kancing variasi depan - rok wanita terbaru", link: "https://shopee.co.id/maundy-skirt-long-square-kancing-variasi-depan-rok-wanita-terbaru-i.350230037.13042171992?sp_atk=6cf1951d-c55a-4868-a3c4-b3eb86edcf68&xptdk=6cf1951d-c55a-4868-a3c4-b3eb86edcf68" },
+                { type: "Sepatu Wanita", name: "COROLLA Ivy Sepatu wanita putih hitam fashion classic sepatu sekolah terbaru coX3123310", link: "https://shopee.co.id/COROLLA-Ivy-Sepatu-wanita-putih-hitam-fashion-classic-sepatu-sekolah-terbaru-coX3123310-i.254543045.20994649093?sp_atk=65a58f21-1d55-47c0-80b0-9f72b876d918&xptdk=65a58f21-1d55-47c0-80b0-9f72b876d918" },
+            ],
+            "Pakaian Anak": [
+                { type: "Baju Anak", name: "Baju Set Anak Laki-laki A02 Ukuran 1-10 Tahun Fashion Anak Cowok Usia 1 2 3 4 5 6 7 8 9 10 Tahun Murah Laki-laki", link: "https://shopee.co.id/Baju-Set-Anak-Laki-laki-A02-Ukuran-1-10-Tahun-Fashion-Anak-Cowok-Usia-1-2-3-4-5-6-7-8-9-10-Tahun-Murah-Laki-laki-i.156237094.18584976187?sp_atk=ca2c731a-9d49-4de2-863a-4f2754fe4a9e&xptdk=ca2c731a-9d49-4de2-863a-4f2754fe4a9e" },
+                { type: "Celana Anak", name: "FSTQL Celana Anak Laki-Laki Cargo Pants Jeans Army Panjang Motif Loreng Keren Fashion Boy - Hijau, 4-5 T", link: "https://shopee.co.id/FSTQL-Celana-Anak-Laki-Laki-Cargo-Pants-Jeans-Army-Panjang-Motif-Loreng-Keren-Fashion-Boy-Hijau-4-5-T-i.351463742.10919451952?sp_atk=2f493429-25c7-4dcb-bfea-04e52f647ad5&xptdk=2f493429-25c7-4dcb-bfea-04e52f647ad5" },
+                { type: "Sepatu Anak", name: "vionty sepatu anak slip on sekolah anak tk sd junior new", link: "https://shopee.co.id/vionty-sepatu-anak-slip-on-sekolah-anak-tk-sd-junior-new-i.284043150.24667663501?sp_atk=cf9e4899-7959-43b7-8ca0-91e50d10044c&xptdk=cf9e4899-7959-43b7-8ca0-91e50d10044c" },
+            ]
+        };
+
+        const form = document.getElementById("searchForm");
+        const resultsDiv = document.getElementById("results");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const brand = form.brand.value;
+            const type = form.type.value;
+
+            let resultsHTML = '';
+
+            if (products[brand]) {
+                const filteredProducts = products[brand].filter(product => type === "" || product.type === type);
+
+                if (filteredProducts.length > 0) {
+                    filteredProducts.forEach(product => {
+                        resultsHTML += `<p><a href="${product.link}" target="_blank">${product.name}</a></p>`;
+                    });
+                } else {
+                    resultsHTML = `<p>No products found for the selected type.</p>`;
+                }
+            } else {
+                resultsHTML = `<p>No products found for the selected category.</p>`;
+            }
+
+            resultsDiv.innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>
